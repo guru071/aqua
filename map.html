@@ -167,6 +167,7 @@
 
                 if (nearest) {
                     map.setView(nearest.getLatLng(), 17);
+                    alert(`Distance:${minDist}KM`);
                     nearest.openPopup();
                 } else {
                     alert("No Water Found ");
