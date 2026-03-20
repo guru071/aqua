@@ -7,73 +7,74 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
     <style>
-   #map {
-    height: 100vh;
-}
+        #map {
+            height: 100vh;
+        }
 
-#topcont {
-    position: relative;
-}
+        #topcont {
+            position: relative;
+        }
 
-.btn {
-    top: 10px;
-    left: 100px;
-    width: 100px;
-    background-color: rgba(225, 225, 255, 0.35);
-    color: black;
-    padding: 8px 12px;
-    border-color: rgb(82, 72, 72);
-    border-radius: 15px;
-    cursor: pointer;
-    position: absolute;
-    z-index: 1000;
-}
+        .btn {
+            top: 10px;
+            left: 100px;
+            width: 100px;
+            background-color: rgba(225, 225, 255, 0.35);
+            color: black;
+            padding: 8px 12px;
+            border-color: rgb(82, 72, 72);
+            border-radius: 15px;
+            cursor: pointer;
+            position: absolute;
+            z-index: 1000;
+        }
 
-#safe {
-    left: 320px;
-}
+        #safe {
+            left: 320px;
+        }
 
-#moderate {
-    left: 430px;
-}
+        #moderate {
+            left: 430px;
+        }
 
-#unsafe {
-    left: 540px;
-}
+        #unsafe {
+            left: 540px;
+        }
 
-#all {
-    left: 210px;
-    background-color: rgba(31, 199, 31, 0.35);
-}
+        #all {
+            left: 210px;
+            background-color: rgba(31, 199, 31, 0.35);
+        }
 
-.btn:hover {
-    box-shadow: 0 0 10px rgb(150, 143, 143),
-        0 0 10px rgb(150, 143, 143),
-        0 0 10px rgb(150, 143, 143),
-        0 0 10px rgb(150, 143, 143);
-}
-@media (max-width: 600px) {
-    .btn {
-        position: static !important; 
-        
-        width: 100px !important; 
-        min-width: 100px !important; 
-        flex-shrink: 0 !important; 
-        
-        max-width: none !important; 
-        
-        padding: 12px 10px !important; 
-        
-        margin: 5px;
-        text-align: center;
-    }
+        .btn:hover {
+            box-shadow: 0 0 10px rgb(150, 143, 143),
+                0 0 10px rgb(150, 143, 143),
+                0 0 10px rgb(150, 143, 143),
+                0 0 10px rgb(150, 143, 143);
+        }
 
-    #topcont {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-}
+        @media (max-width: 600px) {
+            .btn {
+                position: static !important;
+
+                width: 100px !important;
+                min-width: 100px !important;
+                flex-shrink: 0 !important;
+
+                max-width: none !important;
+
+                padding: 12px 10px !important;
+
+                margin: 5px;
+                text-align: center;
+            }
+
+            #topcont {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 
@@ -141,6 +142,7 @@
                         alert("An unknown error occurred.");
                         break;
                 }
+                btnAll();
             }
 
             getLocation();
@@ -259,7 +261,25 @@
                                 { name: "watertank-3", lat: 12.1244, lng: 79.6253, ph: 7, tds: 200, turbidity: 2 },
                                 { name: "watertank-4", lat: 12.1235, lng: 79.6174, ph: 7, tds: 200, turbidity: 2 },
                                 { name: "watertank-5", lat: 12.1285, lng: 79.6221, ph: 7, tds: 200, turbidity: 2 },
-                                { name: "watertank-6", lat: userLat, lng: userLng, ph: 7, tds: 200, turbidity: 2 }
+                                { name: "watertank-6", lat: userLat, lng: userLng, ph: 7, tds: 200, turbidity: 2 },
+
+                                { name: "water tank", lat: 12.125260907071581, lng: 79.62002878817887, ph: 7, tds: 200, turbidity: 2 },
+                                { name: "water tank", lat: 12.12572013225513, lng: 79.63266535082364, ph: 7, tds: 200, turbidity: 2 },
+
+                                { name: "water tank", lat: 12.127275274817352, lng: 79.63550554698574, ph: 7, tds: 200, turbidity: 2 },
+
+                                { name: "water tank", lat: 12.113094603354194, lng: 79.63758509588703, ph: 7, tds: 200, turbidity: 2 },
+
+                                { name: "water tank", lat: 12.101211766421127, lng: 79.63495586333882, ph: 7, tds: 200, turbidity: 2 },
+
+                                { name: "water tank", lat: 12.095570463355546, lng: 79.64594000444983, ph: 7, tds: 200, turbidity: 2 },
+
+                                { name: "water tank", lat: 12.07181861444622, lng: 79.65206030581354, ph: 7, tds: 200, turbidity: 2 },
+
+                                { name: "water tank", lat: 12.086704292021807, lng: 79.63627537625982, ph: 7, tds: 200, turbidity: 2 },
+
+                                { name: "water tank", lat: 12.091362254336262, lng: 79.6260615240067, ph: 7, tds: 200, turbidity: 2 },
+
                             ]
                         },
                         "Maharashtra": {
