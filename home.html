@@ -75,12 +75,22 @@
                 0 0 10px rgb(19, 190, 206),
                 0 0 10px rgb(19, 190, 206);
         }
+
         video {
-    width: 100%;
-    height: 100vh;
-    object-fit: cover;
-    z-index: -1;
-}
+            width: 100%;
+            height: 100vh;
+            object-fit: cover;
+            z-index: -1;
+        }
+        @media(max-width:600px){
+            div{
+                width:250px;
+                height: 160px;
+            }
+            button{
+                width: 100px;
+            }
+        }
     </sTYLe>
 
 
@@ -102,18 +112,17 @@
     <video autoplay muted loop>
         <source src="water.mp4" type="video/mp4">
     </video>
-        <script >
-        function mapView(){
-            sessionStorage.setItem("homeload","true");
-            window.location.href="map.html";
+    <script>
+        function mapView() {
+            sessionStorage.setItem("homeload", "true");
+            window.location.href = "map.html";
         }
-        const button=document.getElementById("map");
-        button.addEventListener( "click",mapView);
-        document.getElementById("detail").addEventListener("click",()=>
-    {
-        sessionStorage.setItem("homeload","true");
-        window.location.href="water_detail.html";
-    })
+        const button = document.getElementById("map");
+        button.addEventListener("click", mapView);
+        document.getElementById("detail").addEventListener("click", () => {
+            sessionStorage.setItem("homeload", "true");
+            window.location.href = "water_detail.html";
+        })
     </script>
 </body>
 
