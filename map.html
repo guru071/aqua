@@ -52,29 +52,26 @@
         0 0 10px rgb(150, 143, 143),
         0 0 10px rgb(150, 143, 143);
 }
-
 @media (max-width: 600px) {
     .btn {
         position: static !important; 
         
-        width: 100px !important;         
+        width: 100px !important; 
+        min-width: 100px !important; 
+        flex-shrink: 0 !important; 
+        
+        max-width: none !important; 
+        
+        padding: 12px 10px !important; 
+        
         margin: 5px;
         text-align: center;
-
     }
 
     #topcont {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
-    }
-
-    #safe,
-    #moderate,
-    #unsafe,
-    #all {
-
-        left: auto !important; 
     }
 }
     </style>
