@@ -56,8 +56,8 @@
 @media (max-width: 600px) {
 
     .btn {
-        position: static;   
-        width: 45%;         
+        position: absolute;   
+        width:100px !important ;         
         margin: 5px;
         display: inline-block;
         text-align: center;
@@ -69,11 +69,12 @@
         justify-content: center;
     }
 
+
     #safe,
     #moderate,
     #unsafe,
     #all {
-        left: auto;
+        left: auto !important;
     }
 }
     </style>
@@ -498,10 +499,10 @@
                 mapd.style.width = "100%";
                 const details = document.getElementById("details");
                 details.style.backgroundColor = "rgba(255, 255, 255, 0.75)";
-                details.style.position = "fixed";
+                details.style.position = "absolute";
                 details.style.top = "0";
                 details.style.right = "0";
-                details.style.width = "200px";
+                details.style.width = "500px";
                 details.style.height = "100vh";
                 details.style.padding = "20px";
                 details.style.boxSizing = "border-box";
