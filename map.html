@@ -280,6 +280,67 @@
 
                                 { name: "water tank", lat: 12.091362254336262, lng: 79.6260615240067, ph: 7, tds: 200, turbidity: 2 },
 
+                                {
+                                    "name": "Kaveri River",
+                                    "type": "River",
+                                    "lat": 13.08,
+                                    "lng": 80.27,
+                                    "ph": 7.2,
+                                    "tds": 350,
+                                    "turbidity": 5,
+                                    "description": "The water quality is moderately clean with a near-neutral pH. TDS is within safe limits, and turbidity is low, making it suitable for domestic use after basic treatment."
+                                },
+                                {
+                                    "name": "Palar River",
+                                    "type": "River",
+                                    "lat": 12.90,
+                                    "lng": 79.20,
+                                    "ph": 7.5,
+                                    "tds": 900,
+                                    "turbidity": 12,
+                                    "description": "This river shows high TDS indicating hard water. Turbidity is moderate, and the water may have a salty taste. It is not suitable for drinking without purification."
+                                },
+                                {
+                                    "name": "Puzhal Lake",
+                                    "type": "Lake",
+                                    "lat": 13.18,
+                                    "lng": 80.18,
+                                    "ph": 7.0,
+                                    "tds": 500,
+                                    "turbidity": 8,
+                                    "description": "The lake water has balanced pH and borderline TDS levels. It is usable after treatment and is commonly used for water supply purposes."
+                                },
+                                {
+                                    "name": "Ambattur Lake",
+                                    "type": "Lake",
+                                    "lat": 13.11,
+                                    "lng": 80.16,
+                                    "ph": 7.8,
+                                    "tds": 1100,
+                                    "turbidity": 20,
+                                    "description": "This lake shows high TDS and turbidity, indicating pollution. The water is not suitable for drinking and requires advanced purification."
+                                },
+                                {
+                                    "name": "Village Pond",
+                                    "type": "Pond",
+                                    "lat": 11.50,
+                                    "lng": 78.50,
+                                    "ph": 6.8,
+                                    "tds": 700,
+                                    "turbidity": 25,
+                                    "description": "The pond water quality is poor with high turbidity and elevated TDS. It may contain contaminants and is unsafe for direct consumption."
+                                },
+                                {
+                                    "name": "Irrigation Tank",
+                                    "type": "Tank",
+                                    "lat": 10.90,
+                                    "lng": 79.80,
+                                    "ph": 7.1,
+                                    "tds": 600,
+                                    "turbidity": 15,
+                                    "description": "The tank water has moderate hardness and turbidity. It can be used for irrigation but requires treatment for drinking purposes."
+                                }
+
                             ]
                         },
                         "Maharashtra": {
@@ -345,13 +406,14 @@
                                     district.forEach(t => {
 
                                         let result = predict(t.ph, t.tds, t.turbidity);
+                                        let desc = t.description || "No description available for this location.";
 
                                         let marker = L.marker([t.lat, t.lng], {
                                             icon: getIcon(result)
                                         }).addTo(map)
                                             .bindPopup(`<b>${t.name}</b><br>
-                                Quality: ${result}<br>
-                                <button class="det">Details</button>`);
+  Quality: ${result}<br>
+  <button class="det" data-desc="${desc}" onclick="detail(this.getAttribute('data-desc'))">Details</button>`);
 
                                         tankMarker.push(marker);
                                         if (userLat !== "" && userLng !== "") {
@@ -393,13 +455,15 @@
 
 
                                         let result = predict(tank.ph, tank.tds, tank.turbidity);
-                                        console.log(result);
+                                        let desc = tank.description || "No description available for this location.";
+
                                         if (result === "Safe") {
                                             let marker = L.marker([tank.lat, tank.lng], {
                                                 icon: getIcon(result)
                                             }).addTo(map)
                                                 .bindPopup(`<b>${tank.name}</b><br>
-       Quality: ${result}<br><button class="det">Details</button>`);
+      Quality: ${result}<br>
+      <button class="det" data-desc="${desc}" onclick="detail(this.getAttribute('data-desc'))">Details</button>`);
                                             tankMarker.push(marker);
                                             if (userLat !== "" && userLng !== "") {
                                                 let d = distance(userLat, userLng, tank.lat, tank.lng);
@@ -437,12 +501,15 @@
                                     district.forEach(tank => {
 
                                         let result = predict(tank.ph, tank.tds, tank.turbidity);
+                                        let desc = tank.description || "No description available for this location.";
+
                                         if (result === "Unsafe") {
                                             let marker = L.marker([tank.lat, tank.lng], {
                                                 icon: getIcon(result)
                                             }).addTo(map)
                                                 .bindPopup(`<b>${tank.name}</b><br>
-       Quality: ${result}<br><button class="det">Details</button>`);
+      Quality: ${result}<br>
+      <button class="det" data-desc="${desc}" onclick="detail(this.getAttribute('data-desc'))">Details</button>`);
                                             tankMarker.push(marker);
                                             if (userLat !== "" && userLng !== "") {
                                                 let d = distance(userLat, userLng, tank.lat, tank.lng);
@@ -482,12 +549,15 @@
                                     district.forEach(tank => {
 
                                         let result = predict(tank.ph, tank.tds, tank.turbidity);
-                                        if (result === "Moderate") {
+                                        let desc = tank.description || "No description available for this location.";
+
+                                        if (result === "Moderate") { 
                                             let marker = L.marker([tank.lat, tank.lng], {
                                                 icon: getIcon(result)
                                             }).addTo(map)
                                                 .bindPopup(`<b>${tank.name}</b><br>
-       Quality: ${result}<br><button class="det">Details</button>`);
+      Quality: ${result}<br>
+      <button class="det" data-desc="${desc}" onclick="detail(this.getAttribute('data-desc'))">Details</button>`);
                                             tankMarker.push(marker);
                                             if (userLat !== "" && userLng !== "") {
                                                 let d = distance(userLat, userLng, tank.lat, tank.lng);
@@ -510,10 +580,10 @@
 
                 document.getElementById("details").style.display = "none";
             }
-            function detail() {
-
+            function detail(det) {
                 const mapd = document.getElementById("map");
                 mapd.style.width = "100%";
+
                 const details = document.getElementById("details");
                 details.style.backgroundColor = "rgba(255, 255, 255, 0.75)";
                 details.style.position = "absolute";
@@ -529,9 +599,10 @@
                 details.style.display = "block";
 
                 details.innerHTML = `
-        <button id="close-btn" style="cursor:pointer; color:red;">Close X</button>
-        <h3>Water Details</h3>`
-                    ;
+        <button id="close-btn" style="cursor:pointer; color:red; padding: 5px; margin-bottom: 10px;">Close X</button>
+        <h3>Water Details</h3>
+        <p>${det}</p> 
+    `;
             }
 
             document.getElementById("find").addEventListener("click", processLocation);
@@ -540,9 +611,7 @@
             document.getElementById("safe").addEventListener("click", btnSafe);
             document.getElementById("moderate").addEventListener("click", btnModerate);
             document.addEventListener("click", function (e) {
-                if (e.target && e.target.classList.contains("det")) {
-                    detail();
-                }
+
                 if (e.target && e.target.id === "close-btn") {
                     close();
                 }
