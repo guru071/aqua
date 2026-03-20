@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Smart Aqua Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <style>
+        #map {
+            height: 100vh;
+        }
+
+        #topcont {
+            position: relative;
+        }
+
+        .btn {
+
+            top: 10px;
+            left: 100px;
+            width: 100px;
+            background-color: rgba(225, 225, 255, 0.35);
+            color: black;
+            padding: 8px 12px;
+            border-color: rgb(82, 72, 72);
+            border-radius: 15px;
+            cursor: pointer;
+            position: absolute;
+            z-index: 1000;
+        }
+
+        #safe {
+            left: 320px;
+        }
+
+        #moderate {
+            left: 430px;
+        }
+
+        #unsafe {
+            left: 540px;
+        }
+
+        #all {
+            left: 210px;
+            background-color: rgba(31, 199, 31, 0.35);
+        }
+
+        .btn:hover {
+            box-shadow: 0 0 10px rgb(150, 143, 143),
+                0 0 10px rgb(150, 143, 143),
+                0 0 10px rgb(150, 143, 143),
+                0 0 10px rgb(150, 143, 143);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="topcont">
+        <div id="map"></div>
+        <button class="btn" id="find">find near by</button>
+        <button class="btn" id="all">All</button>
+        <button class="btn" id="safe">Safe</button>
+        <button class="btn" id="moderate">Moderate</button>
+        <button class="btn" id="unsafe">Unsafe</button>
+    </div>
+    <div id="details">
+        <h3>Water Details</h3>
+
+    </div>
+
+    <script>
+        const navigationType = performance.getEntriesByType("navigation")[0]?.type;
+
+        if (navigationType === 'reload') {
+            sessionStorage.clear("homeload");
+            window.location.href = "home.html";
+        }
+
+        if (sessionStorage.getItem("homeload") == "true") {
+            var userPlace = [];
+            var userLat = "";
+            var userLng = "";
+            let tankMarker = [];
+            let nearby = [];
+            function getLocation() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(showSuccess, showError);
+                } else {
+                    alert("Geolocation is not supported by this browser.");
+                }
+            }
+
+            function showSuccess(position) {
+                userLat = position.coords.latitude;
+                userLng = position.coords.longitude;
+                L.circleMarker([userLat, userLng], {
+                    radius: 8,
+                    color: "blue",
+                    fillColor: "#00f",
+                    fillOpacity: 0.8
+                }).addTo(map).bindPopup("📍 You are here").openPopup();
+                btnAll();
+            }
+
+            function showError(error) {
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                        alert("User denied the request for Geolocation.");
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        alert("Location information is unavailable.");
+                        break;
+                    case error.TIMEOUT:
+                        alert("The request to get user location timed out.");
+                        break;
+                    default:
+                        alert("An unknown error occurred.");
+                        break;
+                }
+            }
+
+            getLocation();
+
+            function processLocation() {
+                if (!userLat) {
+                    alert("Location not ready!");
+                    return;
+                }
+                let nearest = null;
+                let minDist = Infinity;
+                nearby.forEach(marker => {
+                    let pos = marker.getLatLng();
+                    let d = distance(userLat, userLng, pos.lat, pos.lng);
+
+                    if (d < minDist) {
+                        minDist = d;
+                        nearest = marker;
+
+                    }
+                });
+
+                if (nearest) {
+                    map.setView(nearest.getLatLng(), 17);
+                    nearest.openPopup();
+                } else {
+                    alert("No Water Found ");
+                }
+            }
+
+
+            async function getPlace(lat, lng) {
+                let res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+                let data = await res.json();
+
+                let address = data.address;
+
+                let country = address.country || "Unknown";
+                let state = address.state || "Unknown";
+                let district = address.state_district || address.county || "Unknown";
+                let taluk = address.suburb || address.town || address.village || "Unknown";
+
+
+                userPlace = [taluk, district, state, country];
+            }
+            function predict(ph, tds, turbidity) {
+                if (ph >= 6.5 && ph <= 8.5 && tds < 300 && turbidity < 5)
+                    return "Safe";
+                else if (tds < 600)
+                    return "Moderate";
+                else
+                    return "Unsafe";
+            }
+
+            function getIcon(status) {
+                let color = "blue";
+
+                if (status === "Safe") color = "green";
+                else if (status === "Moderate") color = "yellow";
+                else if (status === "Unsafe") color = "red";
+
+                return new L.Icon({
+                    iconUrl: ` https://maps.google.com/mapfiles/ms/icons/${color}-dot.png`,
+                    iconSize: [32, 32]
+                });
+            }
+
+            function distance(lat1, lon1, lat2, lon2) {
+                let R = 6371; // km
+                let dLat = (lat2 - lat1) * Math.PI / 180;
+                let dLon = (lon2 - lon1) * Math.PI / 180;
+
+                let a =
+                    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(lat1 * Math.PI / 180) *
+                    Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+                let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                return R * c;
+            }
+
+
+            var map = L.map('map').setView([13.0827, 80.2707], 11);
+            map.setMaxBounds([
+                [-90, -180],
+                [90, 180]
+            ]);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {}).addTo(map);
+
+
+            tank = {
+                "Asia": {
+                    "India": {
+                        "Tamil Nadu": {
+                            "Chennai": {
+
+                            },
+                            "Coimbatore": {
+
+                            },
+                            "Villupuram": [
+                                { name: "Anna Nagar", lat: 13.0850, lng: 80.2101, ph: 6, tds: 200, turbidity: 2 },
+                                { name: "T Nagar", lat: 13.0418, lng: 80.2341, ph: 11, tds: 200, turbidity: 2 },
+                                { name: "Velachery", lat: 12.9750, lng: 80.2209, ph: 7, tds: 200, turbidity: 2 },
+                                { name: "Tambaram", lat: 12.9249, lng: 80.1000, ph: 7, tds: 200, turbidity: 2 },
+                                { name: "Guindy", lat: 13.0100, lng: 80.2200, ph: 7, tds: 200, turbidity: 2 },
+                                { name: "Adyar", lat: 13.0067, lng: 80.2570, ph: 7, tds: 200, turbidity: 2 },
+                                { name: "Porur", lat: 13.0350, lng: 80.1600, ph: 7, tds: 200, turbidity: 2 },
+                                { name: "Ambattur", lat: 13.1143, lng: 80.1548, ph: 7, tds: 200, turbidity: 2 },
+                                { name: "Perambur", lat: 13.1180, lng: 80.2320, ph: 7, tds: 200, turbidity: 2 },
+                                { name: "Sholinganallur", lat: 12.8996, lng: 80.2279, ph: 7, tds: 200, turbidity: 2 },
+                                { name: "water tank-1", lat: 12.1278, lng: 79.6168, ph: 7, tds: 200, turbidity: 2 },
+                                { name: "watertank-2", lat: 12.1361, lng: 79.6228, ph: 7, tds: 200, turbidity: 2 },
+                                { name: "watertank-3", lat: 12.1244, lng: 79.6253, ph: 7, tds: 200, turbidity: 2 },
+                                { name: "watertank-4", lat: 12.1235, lng: 79.6174, ph: 7, tds: 200, turbidity: 2 },
+                                { name: "watertank-5", lat: 12.1285, lng: 79.6221, ph: 7, tds: 200, turbidity: 2 },
+                                { name: "watertank-6", lat: userLat, lng: userLng, ph: 7, tds: 200, turbidity: 2 }
+                            ]
+                        },
+                        "Maharashtra": {
+                            "Mumbai City": {
+
+                            },
+                            "Pune": {
+
+                            }
+                        }
+                    }
+                },
+                "North America": {
+                    "United States": {
+                        "California": {
+                            "Los Angeles County": {
+
+                            },
+                            "San Francisco": {
+
+                            }
+                        },
+                        "New York": {
+                            "New York City": {
+
+                            }
+                        }
+                    }
+                },
+                "Europe": {
+                    "United Kingdom": {
+                        "England": {
+                            "Greater London": {
+
+                            },
+                            "Greater Manchester": {
+
+                            }
+                        }
+                    }
+                }
+            }
+            var contitent = Object.keys(tank);
+            function btnAll() {
+                document.getElementById("all").style.backgroundColor = "rgba(31, 199, 31, 0.35)";
+
+                document.getElementById("unsafe").style.backgroundColor = "rgba(225, 225, 255, 0.35)";
+
+                document.getElementById("moderate").style.backgroundColor = "rgba(225, 225, 255, 0.35)";
+
+                document.getElementById("safe").style.backgroundColor = "rgba(225, 225, 255, 0.35)";
+
+                tankMarker.forEach(marker => map.removeLayer(marker));
+                tankMarker = [];
+                nearby = [];
+
+                contitent.forEach(cont => {
+                    Object.values(tank[cont]).forEach(country => {
+                        Object.values(country).forEach(state => {
+                            Object.values(state).forEach(district => {
+
+                                if (Array.isArray(district)) {
+                                    district.forEach(t => {
+
+                                        let result = predict(t.ph, t.tds, t.turbidity);
+
+                                        let marker = L.marker([t.lat, t.lng], {
+                                            icon: getIcon(result)
+                                        }).addTo(map)
+                                            .bindPopup(`<b>${t.name}</b><br>
+                                Quality: ${result}<br>
+                                <button class="det">Details</button>`);
+
+                                        tankMarker.push(marker);
+                                        if (userLat !== "" && userLng !== "") {
+                                            let d = distance(userLat, userLng, t.lat, t.lng);
+                                            if (d < 20) {
+                                                nearby.push(marker);
+                                            }
+
+                                        } else {
+                                        }
+
+                                    });
+                                }
+
+                            });
+                        });
+                    });
+                });
+            }
+            function btnSafe() {
+                this.style.backgroundColor = "rgba(31, 199, 31, 0.35)";
+
+                document.getElementById("unsafe").style.backgroundColor = "rgba(225, 225, 255, 0.35)";
+
+                document.getElementById("moderate").style.backgroundColor = "rgba(225, 225, 255, 0.35)";
+
+                document.getElementById("all").style.backgroundColor = "rgba(225, 225, 255, 0.35)";
+                tankMarker.forEach(marker => map.removeLayer(marker));
+                tankMarker = [];
+                nearby = [];
+
+                contitent.forEach(cont => {
+                    Object.values(tank[cont]).forEach(country => {
+                        Object.values(country).forEach(state => {
+                            Object.values(state).forEach(district => {
+
+                                if (Array.isArray(district)) {
+                                    district.forEach(tank => {
+
+
+                                        let result = predict(tank.ph, tank.tds, tank.turbidity);
+                                        console.log(result);
+                                        if (result === "Safe") {
+                                            let marker = L.marker([tank.lat, tank.lng], {
+                                                icon: getIcon(result)
+                                            }).addTo(map)
+                                                .bindPopup(`<b>${tank.name}</b><br>
+       Quality: ${result}<br><button class="det">Details</button>`);
+                                            tankMarker.push(marker);
+                                            if (userLat !== "" && userLng !== "") {
+                                                let d = distance(userLat, userLng, tank.lat, tank.lng);
+                                                if (d < 20) {
+                                                    nearby.push(marker);
+                                                }
+                                            }
+                                        }
+                                    });
+                                }
+
+                            });
+                        });
+                    });
+                });
+            }
+            function btnUnsafe() {
+                this.style.backgroundColor = "rgba(31, 199, 31, 0.35)";
+
+                document.getElementById("safe").style.backgroundColor = "rgba(225, 225, 255, 0.35)";
+
+                document.getElementById("moderate").style.backgroundColor = "rgba(225, 225, 255, 0.35)";
+
+                document.getElementById("all").style.backgroundColor = "rgba(225, 225, 255, 0.35)";
+                tankMarker.forEach(marker => map.removeLayer(marker));
+                tankMarker = [];
+                nearby = [];
+
+                contitent.forEach(cont => {
+                    Object.values(tank[cont]).forEach(country => {
+                        Object.values(country).forEach(state => {
+                            Object.values(state).forEach(district => {
+
+                                if (Array.isArray(district)) {
+                                    district.forEach(tank => {
+
+                                        let result = predict(tank.ph, tank.tds, tank.turbidity);
+                                        if (result === "Unsafe") {
+                                            let marker = L.marker([tank.lat, tank.lng], {
+                                                icon: getIcon(result)
+                                            }).addTo(map)
+                                                .bindPopup(`<b>${tank.name}</b><br>
+       Quality: ${result}<br><button class="det">Details</button>`);
+                                            tankMarker.push(marker);
+                                            if (userLat !== "" && userLng !== "") {
+                                                let d = distance(userLat, userLng, tank.lat, tank.lng);
+                                                if (d < 20) {
+                                                    nearby.push(marker);
+                                                }
+                                            }
+                                        }
+
+
+                                    });
+                                }
+
+                            });
+                        });
+                    });
+                });
+            }
+            function btnModerate() {
+                this.style.backgroundColor = "rgba(31, 199, 31, 0.35)";
+
+                document.getElementById("unsafe").style.backgroundColor = "rgba(225, 225, 255, 0.35)";
+
+                document.getElementById("safe").style.backgroundColor = "rgba(225, 225, 255, 0.35)";
+
+                document.getElementById("all").style.backgroundColor = "rgba(225, 225, 255, 0.35)";
+                tankMarker.forEach(marker => map.removeLayer(marker));
+                tankMarker = [];
+                nearby = [];
+
+                contitent.forEach(cont => {
+                    Object.values(tank[cont]).forEach(country => {
+                        Object.values(country).forEach(state => {
+                            Object.values(state).forEach(district => {
+
+                                if (Array.isArray(district)) {
+                                    district.forEach(tank => {
+
+                                        let result = predict(tank.ph, tank.tds, tank.turbidity);
+                                        if (result === "Moderate") {
+                                            let marker = L.marker([tank.lat, tank.lng], {
+                                                icon: getIcon(result)
+                                            }).addTo(map)
+                                                .bindPopup(`<b>${tank.name}</b><br>
+       Quality: ${result}<br><button class="det">Details</button>`);
+                                            tankMarker.push(marker);
+                                            if (userLat !== "" && userLng !== "") {
+                                                let d = distance(userLat, userLng, tank.lat, tank.lng);
+                                                if (d < 20) {
+                                                    nearby.push(marker);
+                                                }
+                                            }
+                                        }
+
+
+                                    });
+                                }
+
+                            });
+                        });
+                    });
+                });
+            }
+            function close() {
+
+                document.getElementById("details").style.display = "none";
+            }
+            function detail() {
+
+                const mapd = document.getElementById("map");
+                mapd.style.width = "100%";
+                const details = document.getElementById("details");
+                details.style.backgroundColor = "rgba(255, 255, 255, 0.75)";
+                details.style.position = "fixed";
+                details.style.top = "0";
+                details.style.right = "0";
+                details.style.width = "200px";
+                details.style.height = "100vh";
+                details.style.padding = "20px";
+                details.style.boxSizing = "border-box";
+                details.style.zIndex = "9999";
+                details.style.fontFamily = "Arial, sans-serif";
+                details.style.boxShadow = "-2px 0 5px rgba(0,0,0,0.3)";
+                details.style.display = "block";
+
+                details.innerHTML = `
+        <button id="close-btn" style="cursor:pointer; color:red;">Close X</button>
+        <h3>Water Details</h3>`
+                    ;
+            }
+
+            document.getElementById("find").addEventListener("click", processLocation);
+            document.getElementById("all").addEventListener("click", btnAll);
+            document.getElementById("unsafe").addEventListener("click", btnUnsafe);
+            document.getElementById("safe").addEventListener("click", btnSafe);
+            document.getElementById("moderate").addEventListener("click", btnModerate);
+            document.addEventListener("click", function (e) {
+                if (e.target && e.target.classList.contains("det")) {
+                    detail();
+                }
+                if (e.target && e.target.id === "close-btn") {
+                    close();
+                }
+            });
+        } else {
+            alert("Unauthorized access");
+            window.location.href = "home.html";
+        }
+
+
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <sTYLe>
+        body {
+
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f2f5f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        div {
+
+
+            justify-content: center;
+            align-items: center;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            position: absolute;
+
+            overflow: hidden;
+            top: 50%;
+            left: 50%;
+
+            height: 300px;
+            transform: translate(-50%, -50%);
+            overflow: hidden;
+            align-items: center;
+
+
+            align-content: center;
+            background-color: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 0 10px white,
+                0 0 10px white,
+                0 0 10px white,
+                0 0 10px white;
+
+        }
+
+        button {
+            max-width: 250px;
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: white;
+            border: none;
+
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            box-shadow: 0 0 10px rgb(19, 190, 206),
+                0 0 10px rgb(19, 190, 206),
+                0 0 10px rgb(19, 190, 206),
+                0 0 10px rgb(19, 190, 206);
+        }
+    </sTYLe>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=
+    , initial-scale=1.0">
+
+    <title>Water</title>
+</head>
+
+<body>
+    <div>
+        <center>
+            <button id="map">
+                Water source map
+            </button>
+            <button id="detail">
+                Water details
+            </button>
+        </center>
+
+    </div>
+    <video autoplay muted loop>
+        <source src="water.mp4" type="video/mp4">
+    </video>
+        <script >
+        function mapView(){
+            sessionStorage.setItem("homeload","true");
+            window.location.href="map.html";
+        }
+        const button=document.getElementById("map");
+        button.addEventListener( "click",mapView);
+        document.getElementById("detail").addEventListener("click",()=>
+    {
+        sessionStorage.setItem("homeload","true");
+        window.location.href="water_detail.html";
+    })
+    </script>
+</body>
+
+</html>
