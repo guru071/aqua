@@ -6,76 +6,66 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-    <style>
-        #map {
-            height: 100vh;
-        }
+    <style>#map {
+    height: 100vh;
+}
 
-        #topcont {
-            position: relative;
-        }
+#topcont {
+    position: absolute;
+    top: 10px;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+}
 
-        .btn {
-            top: 10px;
-            left: 100px;
-            width: 100px;
-            background-color: rgba(225, 225, 255, 0.35);
-            color: black;
-            padding: 8px 12px;
-            border-color: rgb(82, 72, 72);
-            border-radius: 15px;
-            cursor: pointer;
-            position: absolute;
-            z-index: 1000;
-        }
+.btn {
+    top: 10px;
+    left: 100px;
+    width: 100px;
+    background-color: rgba(225, 225, 255, 0.35);
+    color: black;
+    padding: 8px 12px;
+    border: 1px solid rgb(82, 72, 72);
+    border-radius: 15px;
+    cursor: pointer;
+    position: absolute;
+}
 
-        #safe {
-            left: 320px;
-        }
+#safe { left: 320px; }
+#moderate { left: 430px; }
+#unsafe { left: 540px; }
 
-        #moderate {
-            left: 430px;
-        }
+#all {
+    left: 210px;
+    background-color: rgba(31, 199, 31, 0.35);
+}
 
-        #unsafe {
-            left: 540px;
-        }
+.btn:hover {
+    box-shadow: 0 0 10px rgb(150, 143, 143),
+        0 0 10px rgb(150, 143, 143),
+        0 0 10px rgb(150, 143, 143),
+        0 0 10px rgb(150, 143, 143);
+}
 
-        #all {
-            left: 210px;
-            background-color: rgba(31, 199, 31, 0.35);
-        }
+@media (max-width: 600px) {
 
-        .btn:hover {
-            box-shadow: 0 0 10px rgb(150, 143, 143),
-                0 0 10px rgb(150, 143, 143),
-                0 0 10px rgb(150, 143, 143),
-                0 0 10px rgb(150, 143, 143);
-        }
+    #topcont {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+    }
 
-        @media (max-width: 600px) {
+    .btn {
+        position: relative !important; 
+        left: auto !important;
+        top: auto !important;
 
-            .btn {
-                position: static;
-                width: 45%;
-                margin: 5px;
-                display: inline-block;
-                text-align: center;
-            }
-
-            #topcont {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            #safe,
-            #moderate,
-            #unsafe,
-            #all {
-                left: auto;
-            }
-        }
+        width: 45%;
+        margin: 5px 0;
+        text-align: center;
+    }
+}
     </style>
 </head>
 
